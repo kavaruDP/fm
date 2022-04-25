@@ -20,6 +20,12 @@
             <artifactId>javafx-fxml</artifactId>
             <version>17.0.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.76.Final</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -46,6 +52,7 @@
                         <id>debug</id>
                         <configuration>
                             <options>
+                                <!--suppress UnresolvedMavenProperty ${jpda.address}-->
                                 <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
                             </options>
                             <mainClass>org.example.App</mainClass>
