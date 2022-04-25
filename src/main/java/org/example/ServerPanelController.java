@@ -84,7 +84,7 @@ public class ServerPanelController implements Initializable {
             }
         });
 
-        updateListR(Paths.get(".","Server"));
+        updateListR(Paths.get(".","catalog"));
         upperCatalogName = Paths.get(pathFieldR.getText());
     }
 
