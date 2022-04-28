@@ -1,0 +1,4 @@
+Старт сервера: NettyServer
+Старт клиента: App
+Начало подключения: внутри метода PrimaryController.initialize
+Аутентификация: внутри метода BasicHandler.channelRead

@@ -6,6 +6,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
+import org.example.netty.client.Network;
+import org.example.netty.common.dto.AuthRequest;
+import org.example.netty.common.dto.BasicRequest;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,6 +27,8 @@ public class SecondaryController {
     public void initialize() {
         leftPC = (LocalPanelController) leftPanel.getUserData();
         rightPC = (ServerPanelController) rightPanel.getUserData();
+        //BasicRequest request = new AuthRequest(log, pass);
+        //network.sendMessage(request);
     }
 
     public void exitBtnAction(ActionEvent actionEvent) {

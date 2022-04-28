@@ -7,24 +7,25 @@
 
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.text.Text?>
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.PrimaryController">
    <Label text="Авторизация" />
    <HBox>
       <Label text="Логин   " />
-      <TextField HBox.hgrow="NEVER"/>
+      <TextField fx:id="login" HBox.hgrow="NEVER"/>
       <padding>
-         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         <Insets left="20.0" right="20.0" />
       </padding>
    </HBox>
    <HBox>
       <Label text="Пароль " />
-      <TextField HBox.hgrow="NEVER"/>
+      <TextField fx:id="password" HBox.hgrow="NEVER"/>
       <padding>
-         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         <Insets left="20.0" right="20.0" />
       </padding>
    </HBox>
    <HBox>
-      <Button maxWidth="Infinity" text="Войти" HBox.hgrow="ALWAYS" onAction="#switchToSecondary"/>
+      <Button maxWidth="Infinity" text="Войти" HBox.hgrow="ALWAYS" onAction="#btnAuth"/>
       <Button maxWidth="Infinity" text="Отмена" HBox.hgrow="ALWAYS" onAction="#btnExitAction"/>
       <padding>
          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
