@@ -11,15 +11,8 @@ public class AuthRequest implements BasicRequest {
         return password;
     }
 
-    public void setResult(Boolean result) {
-        this.result = result;
-    }
-    public Boolean getResult() {
-        return result;
-    }
     private String login;
     private String password;
-    private Boolean result;
 
     public AuthRequest(String login, String password) {
         this.login = login;
@@ -29,7 +22,7 @@ public class AuthRequest implements BasicRequest {
 
     @Override
     public String getType() {
-        return "auth";
+        return "AuthRequest";
     }
 
 }

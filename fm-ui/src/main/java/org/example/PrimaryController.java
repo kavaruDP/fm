@@ -7,7 +7,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
+
 import org.example.netty.client.Network;
+import org.example.netty.common.ControllerRegistry;
 import org.example.netty.common.dto.AuthRequest;
 import org.example.netty.common.dto.BasicRequest;
 
@@ -16,7 +18,12 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class PrimaryController implements Initializable {
-    private Network network;
+    //Объявление для pattern singleton
+    private final Network network = Network.getInstance();
+
+    //Обычное объявление
+    //private Network network;
+
     @FXML
     TextField login, password;
     @FXML
@@ -34,12 +41,16 @@ public class PrimaryController implements Initializable {
             return;
         }
         BasicRequest request = new AuthRequest(log, pass);
-        network.sendRequest(request);
-        App.setRoot("secondary");
+
+        try {
+            network.sendRequest(request);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        network = new Network();
-        //network = new Network((args) -> textLogger.appendText((String) args[0]));
+        //network = new Network();
+        ControllerRegistry.register(this);
     }
 }

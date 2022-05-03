@@ -1,4 +1,4 @@
-package org.example.netty.common.dto;
+package org.example.netty.common.dto.commands;
 
 public enum CommandType {
     AUTH,

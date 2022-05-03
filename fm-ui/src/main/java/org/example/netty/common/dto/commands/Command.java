@@ -1,6 +1,4 @@
-package org.example.netty.common.dto;
-
-import org.example.netty.common.dto.commands.*;
+package org.example.netty.common.dto.commands;
 
 import java.io.Serializable;
 

@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import org.example.netty.common.ControllerRegistry;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,6 +30,7 @@ public class LocalPanelController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        ControllerRegistry.register(this);
         TableColumn<FileInfo, String> fileTypeColumn = new TableColumn<>();
         fileTypeColumn.setCellValueFactory(param ->
                 new SimpleStringProperty(param.getValue().getType().getName()));

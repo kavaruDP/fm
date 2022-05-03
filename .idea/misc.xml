@@ -9,8 +9,6 @@
     </option>
     <option name="ignoredFiles">
       <set>
-        <option value="$PROJECT_DIR$/fm-client/pom.xml" />
-        <option value="$PROJECT_DIR$/fm-common/pom.xml" />
         <option value="$PROJECT_DIR$/fm-server/pom.xml" />
       </set>
     </option>

@@ -1,4 +1,4 @@
-package org.example.netty.server;
+package org.example.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -17,7 +17,7 @@ import org.example.netty.common.BasicHandler;
 public class NettyServer {
 
     private static final int MB_20 = 20 * 1_000_000;
-    private static final int PORT = 45002;
+    private static final int PORT = 45004;
 
     public static void main(String[] args) throws InterruptedException {
         EventLoopGroup bossGroup = new NioEventLoopGroup();

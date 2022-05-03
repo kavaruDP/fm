@@ -1,88 +1,113 @@
 package org.example.netty.common;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.example.App;
-import org.example.netty.common.dto.AuthRequest;
-import org.example.netty.common.dto.BasicRequest;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import org.example.netty.common.dto.*;
+import org.example.netty.common.dto.AuthResponse;
 import org.example.netty.common.dto.BasicResponse;
-import org.example.netty.common.dto.GetFileListRequest;
+import org.example.netty.common.dto.GetFileListResponse;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class BasicHandler extends ChannelInboundHandlerAdapter {
-    //список всех подключившихся клиентов
-    private static final List<Channel> channels = new ArrayList<>();
+    private static final String ROOT_DIR = "C:\\Java\\fm\\root-dir\\";
+    private String clientStringDir;
+    private Path clientPathDir;
     private String clientName;
+    private String clientLogin;
+    private final static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+    private Date date;
+
     private static int newClientIndex = 1;
 
-    //private static final Map<Class<? extends BasicRequest>, Consumer<ChannelHandlerContext>> REQUEST_HANDLERS = new HashMap<>();
-
-    //static {
-    //    REQUEST_HANDLERS.put(AuthRequest.class, channelHandlerContext -> {
-    //        BasicResponse loginOkResponse = new BasicResponse("login ok");
-    //        channelHandlerContext.writeAndFlush(loginOkResponse);
-    //    });
-    //
-    //    REQUEST_HANDLERS.put(GetFileListRequest.class, channelHandlerContext -> {
-    //        BasicResponse basicResponse = new BasicResponse("file list....");
-    //        channelHandlerContext.writeAndFlush(basicResponse);
-    //    });
-    //}
-    private static BasicResponse LOGIN_BAD_RESPONSE = new BasicResponse("login bad");
-    private static BasicResponse LOGIN_OK_RESPONSE = new BasicResponse("login ok");
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+//        TODO возможно стоит убрать
+        super.channelActive(ctx);
+        date = new Date();
         clientName = "Клиент №" + newClientIndex;
         newClientIndex++;
-        System.out.println("Подключился " + clientName + " с адреса " + ctx.channel().remoteAddress() + ", контекст =" + ctx);
-        //формируем список подключившихся клиентов (точнее занятых ими каналов)
-        channels.add(ctx.channel());
-
+        System.out.println(dateFormat.format(date) + " " + "Подключился " + clientName + " с адреса " + ctx.channel().remoteAddress());
     }
 
-    //Метод для рассылки сообщений по всем активным каналам
-    public void broadCastMessage(String clientName, String message) {
-        String out = String.format("[%s]:%s\n", clientName, message);
-        BasicResponse bR = new BasicResponse(out);
-        for (Channel c:channels) {
-            c.writeAndFlush(bR);
-        }
-    }
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        date = new Date();
         BasicRequest request = (BasicRequest) msg;
-        //System.out.println(request.getType());
-
-        //Consumer<ChannelHandlerContext> channelHandlerContextConsumer = REQUEST_HANDLERS.get(request.getClass());
-        //channelHandlerContextConsumer.accept(ctx);
 
         if (request instanceof AuthRequest) {
+            System.out.println(dateFormat.format(date) + " " + clientName + ": получен AuthRequest");
             AuthRequest authRequest = (AuthRequest) request;
-
-            if (authRequest.getLogin().equals("dp")) {
-                ctx.writeAndFlush(LOGIN_OK_RESPONSE);
-                        //.addListener(ChannelFutureListener.CLOSE);
+//            TODO написать метод для аутентификации по паролю
+            if (authRequest.getPassword().equals("123")) {
+                clientLogin =  authRequest.getLogin();
+                if (clientLogin.isEmpty() || clientLogin.isBlank()) {
+                    ctx.writeAndFlush(new AuthResponse("login bad"));
+                    System.out.println(dateFormat.format(date) + ":отсутствует логин. На адрес " + ctx.channel().remoteAddress() + " отправлен AuthResponse(login bad)");
+                    return;
+                }
+                if(!updateClientAccount(clientLogin)) {
+                    ctx.writeAndFlush(new AuthResponse("login bad"));
+                    System.out.println(dateFormat.format(date) + ": отсутствует домашний каталог. На адрес " + ctx.channel().remoteAddress() + " отправлен AuthResponse(login bad)");
+                } else {
+                    ctx.writeAndFlush(new AuthResponse("login ok"));
+                    System.out.println(dateFormat.format(date) + ": на адрес " + ctx.channel().remoteAddress() + " отправлен AuthResponse(login ok)");
+                }
             } else {
-                //authRequest.setResult(false);
-                ctx.writeAndFlush(LOGIN_BAD_RESPONSE);
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Введен неверный пароль!", ButtonType.OK);
+                alert.showAndWait();
+                ctx.writeAndFlush(new AuthResponse("login bad"));
+                System.out.println(dateFormat.format(date) + ": введен неверный пароль. На адрес " + ctx.channel().remoteAddress() + " отправлен AuthResponse(login bad)");
             }
 
         } else if (request instanceof GetFileListRequest) {
-            BasicResponse basicResponse = new BasicResponse("file list....");
-            ctx.writeAndFlush(basicResponse);
+            System.out.println(dateFormat.format(date) + " " + clientName + ": получен GetFileListRequest");
+            if(clientStringDir.isEmpty() || clientStringDir.isBlank() || clientPathDir == null){
+                System.out.println(dateFormat.format(date) + ": проблема с каталогом для логина " + clientLogin + ". Вероятнее всего недостаточно прав для его создания.");
+                return;
+            } else {
+                List<File> filesList = Files.list(clientPathDir)
+                        .map(Path::toFile)
+                        .collect(Collectors.toList());
+                BasicResponse basicResponse = new GetFileListResponse(clientStringDir, filesList);
+                ctx.writeAndFlush(basicResponse);
+                System.out.println(dateFormat.format(date) + ": на адрес " + ctx.channel().remoteAddress() + " - отправлен GetFileListResponse");
+            }
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         System.out.println(clientName + " отключился");
-        //cause.printStackTrace();
-        //удаляем из списка активных каналов канал отключившегося клиента
-        channels.remove(ctx.channel());
+        cause.printStackTrace();
         ctx.close();
+    }
+
+    private boolean updateClientAccount (String clientLogin) {
+        clientStringDir = ROOT_DIR + clientLogin;
+        System.out.println(clientName + ": clientStringDir = " + clientStringDir);
+        clientPathDir = Paths.get(clientStringDir);
+        if(!Files.exists(clientPathDir)) {
+            System.out.println(dateFormat.format(date) + ": каталог для логина " + clientLogin + " на сервере не найден. Создаем новый...");
+            try {
+                clientPathDir = Files.createDirectory(clientPathDir);
+                return true;
+            } catch (IOException e) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -9,8 +9,6 @@
     <modules>
         <module>fm-ui</module>
         <module>fm-server</module>
-        <module>fm-client</module>
-        <module>fm-common</module>
     </modules>
 
     <properties>

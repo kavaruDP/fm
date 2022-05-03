@@ -6,9 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
-import org.example.netty.client.Network;
-import org.example.netty.common.dto.AuthRequest;
-import org.example.netty.common.dto.BasicRequest;
+import org.example.netty.common.ControllerRegistry;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,8 +25,6 @@ public class SecondaryController {
     public void initialize() {
         leftPC = (LocalPanelController) leftPanel.getUserData();
         rightPC = (ServerPanelController) rightPanel.getUserData();
-        //BasicRequest request = new AuthRequest(log, pass);
-        //network.sendMessage(request);
     }
 
     public void exitBtnAction(ActionEvent actionEvent) {
@@ -36,7 +32,6 @@ public class SecondaryController {
     }
 
     public void copyBtnAction(ActionEvent actionEvent) {
-        // leftPanel - это ссылка на VBox
 
         if (leftPC.getSelectedFilenameL() == null && rightPC.getSelectedFilenameR() == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Файл не выбран", ButtonType.OK);
@@ -55,7 +50,7 @@ public class SecondaryController {
         }
 
         try {
-            // копирование с помощью nio
+//          TODO Заменить копирование файлов на сетевой транспорт
             Files.copy(srcPath,dstPath);
             leftPC.updateListL(Paths.get(leftPC.getCurrentPathL()));
             rightPC.updateListR(Paths.get(rightPC.getCurrentPathR()));

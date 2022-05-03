@@ -6,23 +6,22 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+
 public class FileInfo {
+
     public enum FileType {
         FILE("F"), DIRECTORY ("D");
-        private String name;
-        public String getName() {
-            return name;
-        }
+        private final String name;
+        public String getName() {return name;}
         FileType(String name) {
             this.name = name;
         }
     }
+
     public enum DirLevel {
         L0("0"), L1("1"), L2("2"), L3("3"), L4("4"), L5("..");
-        private String name;
-        public String getName() {
-            return name;
-        }
+        private final String name;
+        public String getName() {return name;}
         DirLevel(String name) {
             this.name = name;
         }
@@ -36,40 +35,17 @@ public class FileInfo {
     public String getFilename() {
         return filename;
     }
-
     public FileType getType() {
         return type;
     }
-
     public DirLevel getLevel() {
         return level;
     }
     public long getSize() {
         return size;
     }
-
     public LocalDateTime getLastModified() {
         return lastModified;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public void setType(FileType type) {
-        this.type = type;
-    }
-
-    public void setLevel(DirLevel level) {
-        this.level = level;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public void setLastModified(LocalDateTime lastModified) {
-        this.lastModified = lastModified;
     }
 
     public FileInfo(Path path) {

@@ -1,4 +1,9 @@
 Старт сервера: NettyServer
-Старт клиента: App
-Начало подключения: внутри метода PrimaryController.initialize
+Старт клиента (запуск первой сцены): App
+Начало подключения: внутри метода PrimaryController.initialize, через Network.getInstance()
 Аутентификация: внутри метода BasicHandler.channelRead
+Ветвление по ответам от сервера: ClientHandler.channelRead(ChannelHandlerContext ctx, Object msg)
+Запуск второй сцены (после успешной аутентификации): внутри метода ClientService.loginOk()
+
+Запрос списка файлов с пользовательского каталога на сервере:
+
