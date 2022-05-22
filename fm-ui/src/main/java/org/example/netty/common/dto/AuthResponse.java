@@ -6,6 +6,7 @@ public class AuthResponse implements BasicResponse {
     }
 
     private String result;
+    private String fullClientHomeDir = "";
 
     public AuthResponse(String result) {
         this.result = result;
@@ -13,5 +14,11 @@ public class AuthResponse implements BasicResponse {
     @Override
     public String getType() {
         return "AuthResponse";
+    }
+    public String getFullClientHomeDir() {
+        return fullClientHomeDir;
+    }
+    public void setFullClientHomeDir(String ClientHomeDir) {
+        this.fullClientHomeDir = ClientHomeDir;
     }
 }

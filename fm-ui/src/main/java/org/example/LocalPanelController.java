@@ -31,6 +31,7 @@ public class LocalPanelController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ControllerRegistry.register(this);
+
         TableColumn<FileInfo, String> fileTypeColumn = new TableColumn<>();
         fileTypeColumn.setCellValueFactory(param ->
                 new SimpleStringProperty(param.getValue().getType().getName()));

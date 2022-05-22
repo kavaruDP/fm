@@ -1,6 +1,5 @@
 package org.example.netty.common.dto;
 
-
 public class AuthRequest implements BasicRequest {
 
     public String getLogin() {
@@ -19,7 +18,6 @@ public class AuthRequest implements BasicRequest {
         this.password = password;
 
     }
-
     @Override
     public String getType() {
         return "AuthRequest";

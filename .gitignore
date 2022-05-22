@@ -3,3 +3,4 @@
 /.idea/
 /root-dir/
 /fm-ui/target/
+/fm-ui/src/main/java/org/example/netty/common/database/

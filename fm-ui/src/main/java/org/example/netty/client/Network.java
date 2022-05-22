@@ -52,7 +52,7 @@ public class Network {
                 workerGroup.shutdownGracefully();
             }
         });
-        t.setDaemon(true);
+        //t.setDaemon(true);
         t.start();
     }
 

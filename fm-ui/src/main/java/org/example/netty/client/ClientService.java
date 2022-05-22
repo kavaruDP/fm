@@ -1,5 +1,7 @@
 package org.example.netty.client;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.example.App;
 import org.example.ServerPanelController;
 import org.example.netty.common.ControllerRegistry;
@@ -18,11 +20,15 @@ public class ClientService {
         }
     }
 
-    public void putServerFileList(Path path, List<File> serverItemList) {
+
+
+
+    public void putServerFileList(String dir, List<File> serverItemList) {
         ServerPanelController controllerObject =
                 (ServerPanelController) ControllerRegistry.getControllerObject(ServerPanelController.class);
         //controllerObject.renderServerFileList(serverItemList);
-        controllerObject.updateServerFilesList(path, serverItemList);
+        //controllerObject.updateServerFilesList(path, serverItemList);
+        controllerObject.updateServerFilesListFromString(dir, serverItemList);
     };
 
 }

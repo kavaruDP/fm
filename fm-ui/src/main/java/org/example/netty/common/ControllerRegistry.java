@@ -16,5 +16,4 @@ public class ControllerRegistry {
         return CONTROLLER_REGISTRY.get(controller);
     }
 
-
 }

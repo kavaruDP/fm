@@ -2,6 +2,8 @@ package org.example.netty.common;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.example.PrimaryController;
+import org.example.ServerPanelController;
 import org.example.netty.client.ClientService;
 import org.example.netty.common.dto.*;
 import org.example.netty.common.dto.BasicResponse;
@@ -14,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static org.example.ServerPanelController.CURRENT_USER_SERVER_DIR;
+//import static org.example.ServerPanelController.CURRENT_LEVEL_SERVER_DIR;
 
 // Используется при обработке pipeline на стороне клиента (NettyClient)
 public class ClientHandler extends ChannelInboundHandlerAdapter {
@@ -31,30 +33,36 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         date = new Date();
-
+        PrimaryController controllerObject =
+                (PrimaryController) ControllerRegistry.getControllerObject(PrimaryController.class);
         BasicResponse response = (BasicResponse) msg;
 
         if (response instanceof AuthResponse) {
-            String responseText = ((AuthResponse) response).getResult();
-            System.out.println(dateFormat.format(date) + ": получен AuthResponse");
+            AuthResponse authResponse = (AuthResponse) response;
+            String responseText = authResponse.getResult();
+            System.out.println(dateFormat.format(date) + ": получен AuthResponse. Домашний каталог = " + authResponse.getFullClientHomeDir());
             if ("login ok".equals(responseText)) {
-                ctx.writeAndFlush(new GetFileListRequest());
+                ctx.writeAndFlush(new GetFileListRequest(authResponse.getFullClientHomeDir()));
                 System.out.println(dateFormat.format(date) + " на адрес " + ctx.channel().remoteAddress() + " отправлен GetFileListRequest");
                 clientService.loginOk();
                 return;
             }
-            if ("login bad".equals(responseText)) {
-                System.out.println(dateFormat.format(date) + ": login bad");
-            }
+            controllerObject.setResultField(responseText);
+            return;
+        }
+
+        if (response instanceof RegResponse) {
+            RegResponse regResponse = (RegResponse) response;
+
+            controllerObject.setResultField(regResponse.getResult());
             return;
         }
 
        if (response instanceof GetFileListResponse) {
             GetFileListResponse getFileListResponse = (GetFileListResponse) response;
-            CURRENT_USER_SERVER_DIR = Paths.get(getFileListResponse.getClientStringDir());
             System.out.println(dateFormat.format(date) + ": получен GetFileListResponse. CURRENT_USER_SERVER_DIR = " + getFileListResponse.getClientStringDir());
             List<File> serverItemList = ( (GetFileListResponse) response ).getItemList();
-            clientService.putServerFileList(CURRENT_USER_SERVER_DIR, serverItemList);
+            clientService.putServerFileList(getFileListResponse.getClientStringDir(), serverItemList);
             return;
 
 //            TODO выяснить в каком месте закрывать контекст канала и надо ли это делать.

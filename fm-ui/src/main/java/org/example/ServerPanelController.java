@@ -26,23 +26,23 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class ServerPanelController implements Initializable {
-    public static List<File> CURRENT_USER_SERVER_FILES = new ArrayList<>();
-    public static Path CURRENT_USER_SERVER_DIR;
+    private List<File> CURRENT_USER_SERVER_FILES = new ArrayList<>();
+    private static Path fullClientCurrentPath;    // имеет вид: "C:\Java\fm\root-dir\dp\dp1"
+    public static Path FULL_CLIENT_HOME_PATH;     // имеет вид: "C:\Java\fm\root-dir\dp"
     private final Network network = Network.getInstance();
     @FXML
     TableView<FileInfo> filesTableR;
     @FXML
     TextField pathFieldR;
 
-    private Path upperCatalogName;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         ControllerRegistry.register(this);
-        TableColumn<FileInfo, String> fileTypeColumn = new TableColumn<>();
-        fileTypeColumn.setCellValueFactory(param ->
+        TableColumn<FileInfo, String> fileLevelColumn = new TableColumn<>();
+        fileLevelColumn.setCellValueFactory(param ->
                 new SimpleStringProperty(param.getValue().getLevel().getName()));
-        fileTypeColumn.setPrefWidth(20);
+        fileLevelColumn.setPrefWidth(20);
 
         TableColumn<FileInfo, String> filenameColumn = new TableColumn<>("Имя");
         filenameColumn.setCellValueFactory(param ->
@@ -53,6 +53,7 @@ public class ServerPanelController implements Initializable {
         filesizeColumn.setCellValueFactory(param ->
                 new SimpleObjectProperty<>(param.getValue().getSize()));
         filesizeColumn.setPrefWidth(100);
+
         filesizeColumn.setCellFactory(param -> {
             return new TableCell<FileInfo, Long>() {
                 @Override
@@ -78,32 +79,31 @@ public class ServerPanelController implements Initializable {
                 new SimpleStringProperty(param.getValue().getLastModified().format(dtf)));
         fileDateColumn.setPrefWidth(120);
 
-        filesTableR.getColumns().addAll(fileTypeColumn, filenameColumn, filesizeColumn, fileDateColumn);
-        filesTableR.getSortOrder().add(fileTypeColumn);
+        filesTableR.getColumns().addAll(fileLevelColumn, filenameColumn, filesizeColumn, fileDateColumn);
+        filesTableR.getSortOrder().add(fileLevelColumn);
         filesTableR.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if(mouseEvent.getClickCount() == 2) {
-                    // Paths.get(pathField.getText()) = корень текущего каталога
-                    // filesTable.getSelectionModel()... = имя выбранного файла
-                    // ...resolve... = склейка пути и файла
-                    Path path = Paths.get(pathFieldR.getText()).resolve(filesTableR.getSelectionModel().getSelectedItem().getFilename());
+                    // Данный блок работает только с локальной файловой системой
+                    /*
+                    Path path = Paths.get(pathFieldR.getText())
+                            .resolve(filesTableR.getSelectionModel()
+                                    .getSelectedItem().getFilename());
                     if (Files.isDirectory(path)) {
-                        updateListR(path);
+                        getServerFilesList(path);
                     }
+                     */
+
                 }
             }
         });
 
-        //updateListR(Paths.get(".","root-dir"));
-        //updateServerFilesList(CURRENT_USER_SERVER_DIR, CURRENT_USER_SERVER_FILES);
-        //upperCatalogName = Paths.get(pathFieldR.getText());
-        upperCatalogName = CURRENT_USER_SERVER_DIR;
+        //pathFieldR.setText("user");
     }
-//  TODO Реализовать через сетевое взаимодействие (метод получения списка файлов из текущего каталога на сервере)
     public void getServerFilesList(Path path) {
         String currentDir = path.normalize().toAbsolutePath().toString();
-        BasicRequest request = new GetFileListRequest();
+        BasicRequest request = new GetFileListRequest(currentDir);
         try {
             network.sendRequest(request);
         } catch (InterruptedException e) {
@@ -135,16 +135,27 @@ public class ServerPanelController implements Initializable {
         filesTableR.getItems().addAll(serverFileInfoList);
         filesTableR.sort();
     }
+
+    public void updateServerFilesListFromString(String currentClientDir, List<File> serverFileList) {
+        pathFieldR.setText(currentClientDir);
+        filesTableR.getItems().clear();
+        List<FileInfo> serverFileInfoList = serverFileList.stream()
+                .map(File::toPath)
+                .map(FileInfo::new)
+                .collect(Collectors.toList());
+        filesTableR.getItems().addAll(serverFileInfoList);
+        filesTableR.sort();
+    }
+
     public void btnPathUpActionR(ActionEvent actionEvent) {
-        Path currentPath = Paths.get(pathFieldR.getText());
         Path upperPath = Paths.get(pathFieldR.getText()).getParent();
-        if (currentPath.equals(upperCatalogName)) {
+        if (fullClientCurrentPath.equals(FULL_CLIENT_HOME_PATH)) {
             return;
         }
         if (upperPath == null) {
             return;
         }
-        updateListR(upperPath);
+        getServerFilesList(upperPath);
     }
 
     public String getSelectedFilenameR() {
@@ -160,9 +171,5 @@ public class ServerPanelController implements Initializable {
 
     public String getCurrentPathR() {
         return pathFieldR.getText();
-    }
-//    TODO убрать метод
-    public void renderServerFileList(List<File> serverItemList) {
-        updateServerFilesList(Paths.get(".", "root-dir"), serverItemList);
     }
 }
