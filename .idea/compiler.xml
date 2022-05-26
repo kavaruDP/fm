@@ -13,6 +13,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="fm-laba" target="11" />
       <module name="fm-server" target="11" />
     </bytecodeTargetLevel>
   </component>

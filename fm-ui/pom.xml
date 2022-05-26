@@ -49,7 +49,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>org.example.App</mainClass>
+                            <mainClass>org.example.client.App</mainClass>
                         </configuration>
                     </execution>
                     <execution>
@@ -58,7 +58,7 @@
                             <options>
                                 <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
                             </options>
-                            <mainClass>org.example.App</mainClass>
+                            <mainClass>org.example.client.App</mainClass>
                         </configuration>
                     </execution>
                 </executions>
